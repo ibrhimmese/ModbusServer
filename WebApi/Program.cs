@@ -56,7 +56,7 @@ builder.Services.AddCors(options => //Cors Settings
     policy.AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials().
-    WithOrigins("http://192.168.1.11:5173", "https://192.168.1.11:5173", "http://192.168.1.11:5297", "https://192.168.1.11:6098")
+    WithOrigins()
 
     //.SetIsOriginAllowed(policy => true)
     );
@@ -132,5 +132,50 @@ app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Baþlangýçta SuperAdmin kullanýcý ve rol kontrolü
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+    var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<AppRole>>();
+
+    string roleName = builder.Configuration["SeedUser:RoleName"];
+    string superAdminUserName = builder.Configuration["SeedUser:UserName"];
+    string superAdminPassword = builder.Configuration["SeedUser:Password"];
+    string superAdminEmail = builder.Configuration["SeedUser:Email"];
+    string nameSurname = builder.Configuration["SeedUser:NameSurname"];
+
+    // Rol yoksa oluþtur
+    if (!await roleManager.RoleExistsAsync(roleName))
+    {
+        await roleManager.CreateAsync(new AppRole { Name = roleName });
+    }
+
+    // Kullanýcýyý kontrol et
+    var superAdmin = await userManager.FindByNameAsync(superAdminUserName);
+    if (superAdmin is null)
+    {
+        superAdmin = new AppUser
+        {
+            UserName = superAdminUserName,
+            NameSurname= nameSurname,
+            Email = superAdminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userManager.CreateAsync(superAdmin, superAdminPassword);
+
+        if (result.Succeeded)
+        {
+            await userManager.AddToRoleAsync(superAdmin, roleName);
+        }
+        else
+        {
+            throw new Exception("Super admin oluþturulamadý");
+        }
+    }
+}
+
 app.MapControllers();
 app.Run();
