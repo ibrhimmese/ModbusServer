@@ -1,5 +1,6 @@
 using Application;
 using Application.ExceptionTypes;
+using Application.Services.ModbusServices;
 using Domain.BaseProjeEntities.IdentityEntities;
 using Infrastructure;
 using Infrastructure.Exceptions.Extensions;
@@ -18,7 +19,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddNewtonsoftJson(); ;
 
 builder.Services.AddScoped<AuthenticationFilter>();
 builder.Services.AddScoped<RolePermissionFilter>();
@@ -37,7 +38,7 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 
 builder.Services.AddPersistenceServices(builder.Configuration);
 
-builder.Services.AddApplicationServices();
+builder.Services.AddApplicationServices(builder.Configuration);
 
 builder.Services.AddInfrastructureServices();
 
@@ -45,6 +46,9 @@ builder.Services.AddStorage<LocalStorage>();
 
 builder.Services.AddDistributedMemoryCache();
 //builder.Services.AddStackExchangeRedisCache(opt=>opt.Configuration="localhost:6379");
+
+builder.Services.AddScoped<EnergyDataService>();
+builder.Services.AddHostedService<EnergyDataBackgroundService>();
 
 builder.Services.AddHttpContextAccessor();
 

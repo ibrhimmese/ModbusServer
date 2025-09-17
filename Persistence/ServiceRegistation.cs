@@ -1,4 +1,5 @@
 ﻿using Application.AuthorizeAndAuthentication.JwtTokenHandlerInterface.AuthenticationsInterfaces;
+using Application.Interfaces.RepositoryServices;
 using Application.Interfaces.RepositoryServices.EndpointRepositories;
 using Application.Interfaces.RepositoryServices.MenuRepositories;
 using Application.JwtTokenHandlerInterface.AuthenticationsInterfaces;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Authorize;
 using Persistence.Contexts;
+using Persistence.Repositories;
 using Persistence.Repositories.EndpointRepository;
 using Persistence.Repositories.MenuRepository;
 
@@ -25,6 +27,13 @@ public static class ServiceRegistration
 
         services.AddScoped<IEndpointWriteRepository, EndpointWriteRepository>();
         services.AddScoped<IEndpointReadRepository, EndpointReadRepository>();
+
+        services.AddScoped<IDeviceReadRepository, DeviceReadRepository>();
+        services.AddScoped<IDeviceWriteRepository, DeviceWriteRepository>();
+        services.AddScoped<IGatewayReadRepository, GatewayReadRepository>();
+        services.AddScoped<IGatewayWriteRepository, GatewayWriteRepository>();
+        services.AddScoped<IEnergyDataReadRepository, EnergyDataReadRepository>();
+        services.AddScoped<IEnergyDataWriteRepository, EnergyDataWriteRepository>();
 
 
         services.AddScoped<IAuthorizationEndpointService, AuthorizationEndpointService>();

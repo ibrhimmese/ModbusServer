@@ -1,5 +1,7 @@
 ﻿using Application.Pipelines;
+using Application.Services.ModbusServices;
 using FluentValidation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -7,9 +9,10 @@ namespace Application;
 
 public static class ServiceRegistration
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
-       
+
+        services.Configure<ModbusSettings>(configuration.GetSection("ModbusSettings"));
 
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
